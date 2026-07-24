@@ -1,34 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Codedrill</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeDrill</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-	<div class="layout">
-		<h1 id="header">CodeDrill</h1>
-		<p id="rules">You've got 5 minutes to code your way through a random little python challenge!
-		The AI will judge your solution. Can you outsmart the machine?</p>
-		<p id="choose_mode">Choose a gamemode:</p>
-		<p id="choose_level">Choose a level:</p>
-		<p id="time"></p>
-		<button id="singleplayer">singleplayer</button>
-		<button id="AI">vsAI</button>
-		<button id="easy">Easy</button>
-		<button id="medium">Medium</button>
-		<button id="hard">Hard</button>
-		<div id="challenge"></div>
-		<textarea id="editor"></textarea>
-		<button id="submit">SUBMIT</button>
-		<p id="gemini"></p>
-		<button id="PG">Play this mode again.</button>
-		<button id="reset">Back to home screen</button>
-	</div>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
-	<script src="code_clash.js"></script>
+    <div class="app-container">
+        <header class="header-section">
+            <h1 id="header">CodeDrill</h1>
+            <p id="rules">You've got 5 minutes to code your way through a random Python challenge! The AI will judge your solution. Can you outsmart the machine?</p>
+            <p id="choose_mode">Choose a gamemode:</p>
+            <div class="btn-group mode-buttons">
+                <button id="singleplayer" class="btn btn-primary">Singleplayer</button>
+                <button id="AI" class="btn btn-primary">vs AI</button>
+            </div>
+        </header>
+
+        <section class="level-section">
+            <p id="choose_level">Choose a level:</p>
+            <div class="btn-group level-buttons">
+                <button id="easy" class="btn btn-easy">Easy</button>
+                <button id="medium" class="btn btn-medium">Medium</button>
+                <button id="hard" class="btn btn-hard">Hard</button>
+            </div>
+        </section>
+
+        <main class="game-area">
+            <div class="left-panel">
+                <div id="time" class="timer-card"></div>
+                <div id="challenge" class="challenge-card"></div>
+                <textarea id="editor"></textarea>
+                <div class="action-buttons">
+                    <button id="submit" class="btn btn-submit">SUBMIT</button>
+                    <button id="PG" class="btn btn-secondary">Play Again</button>
+                    <button id="reset" class="btn btn-danger">Home</button>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div id="gemini" class="ai-card"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+    <script src="code_clash.js"></script>
 </body>
 </html>
