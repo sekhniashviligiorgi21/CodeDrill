@@ -8,27 +8,67 @@ const screens = {
 
 const rules = document.getElementById('rules');
 const header = document.getElementById('header');
+const homeNavBtn = document.getElementById('home-nav-btn');
 const challengeBox = document.getElementById('challenge');
 const aiBox = document.getElementById('gemini');
+const submitBtn = document.getElementById('submit');
 
 //---------------------------------- Default CodeMirror --------------------------------
 const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
     mode: "python",
     theme: "dracula",
     lineNumbers: true,
-    tabSize: 4, // Python standard is 4 spaces
+    tabSize: 4,
     indentWithTabs: false,
     lineWrapping: true
 });
 editor.setValue("# Write your Python code here...\n");
 
-//---------------------------------- Utility: View Routing --------------------------------
+//---------------------------------- Reset Helpers --------------------------------
+function resetSubmitButton() {
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Code";
+    }
+}
+
+function resetToHome() {
+    if (timerInterval) clearInterval(timerInterval);
+    
+    header.innerText = "CodeDrill";
+    rules.classList.remove('hidden');
+    
+    resetSubmitButton();
+    
+    challengeBox.innerHTML = '';
+    aiBox.innerHTML = '';
+    aiBox.classList.add('hidden');
+    editor.setValue("# Write your Python code here...\n");
+    
+    showScreen('mode');
+}
+
+//---------------------------------- View Routing --------------------------------
 function showScreen(screenKey) {
     Object.values(screens).forEach(screen => screen.classList.add('hidden'));
     if (screens[screenKey]) {
         screens[screenKey].classList.remove('hidden');
     }
+
+    // Toggle top navigation Home button visibility
+    if (screenKey === 'mode') {
+        homeNavBtn.classList.add('hidden');
+    } else {
+        homeNavBtn.classList.remove('hidden');
+    }
+
+    // Always restore the submit button text whenever switching views
+    resetSubmitButton();
 }
+
+// Global click event to always return home
+header.onclick = resetToHome;
+homeNavBtn.onclick = resetToHome;
 
 //------------------------------------- Timer Function --------------------------------
 let seconds = 300;
@@ -45,7 +85,7 @@ function updateTime() {
     if (seconds <= 0) {
         clearInterval(timerInterval);
         document.getElementById("time").innerText = "00:00";
-        document.getElementById("submit").click();
+        submitBtn.click();
     }
 }
 
@@ -62,7 +102,9 @@ function timer() {
 
 //------------------------------------ Play Again function --------------------------
 function playagain() {
-    document.getElementById("submit").disabled = false;
+    if (timerInterval) clearInterval(timerInterval);
+    resetSubmitButton();
+    
     challengeBox.innerHTML = '';
     aiBox.innerHTML = '';
     aiBox.classList.add('hidden');
@@ -75,12 +117,10 @@ async function level(levelType) {
     rules.classList.add('hidden');
     showScreen('game');
     
-    // Crucial fix: CodeMirror needs a refresh when its container goes from hidden -> visible
     setTimeout(() => editor.refresh(), 50); 
-    
     timer();
 
-    document.getElementById("reset").onclick = () => location.reload();
+    document.getElementById("reset").onclick = resetToHome;
     document.getElementById("PG").onclick = playagain;
 
     challengeBox.innerHTML = '<p>Loading challenge...</p>';
@@ -94,11 +134,10 @@ async function level(levelType) {
         <p><strong>Example: </strong><br> Input: <code>${challenge.input_example}</code> <br> Output: <code>${challenge.output_example}</code></p>
     `;
 
-    const submitBtn = document.getElementById("submit");
     submitBtn.onclick = async function() {
         submitBtn.disabled = true;
         submitBtn.textContent = "Analyzing...";
-        clearInterval(timerInterval); // Stop timer on submit
+        clearInterval(timerInterval);
         
         const code = editor.getValue();
         const res = await fetch("https://code-clash-backend-mqjr.onrender.com/analyzing-code", {
@@ -127,7 +166,7 @@ async function vsAI(lvl) {
     setTimeout(() => editor.refresh(), 50);
     timer();
 
-    document.getElementById("reset").onclick = () => location.reload();
+    document.getElementById("reset").onclick = resetToHome;
     document.getElementById("PG").onclick = playagain;
 
     challengeBox.innerHTML = '<p>Loading challenge...</p>';
@@ -141,7 +180,6 @@ async function vsAI(lvl) {
         <p><strong>Example: </strong><br> Input: <code>${challenge.input_example}</code> <br> Output: <code>${challenge.output_example}</code></p>
     `;
 
-    const submitBtn = document.getElementById("submit");
     submitBtn.onclick = async function() {
         submitBtn.disabled = true;
         submitBtn.textContent = "Analyzing Code...";
@@ -184,13 +222,11 @@ async function vsAI(lvl) {
     };
 }
 
-
 //------------------------- Mode Event Listeners ----------------------------------
 document.getElementById("singleplayer").onclick = function() {
     header.innerText = "Singleplayer";
     showScreen('level');
     
-    // Rebind level buttons for Singleplayer
     document.getElementById("easy").onclick = () => level("easy");
     document.getElementById("medium").onclick = () => level("medium");
     document.getElementById("hard").onclick = () => level("hard");
@@ -200,7 +236,6 @@ document.getElementById("AI").onclick = function() {
     header.innerText = "vs AI";
     showScreen('level');
     
-    // Rebind level buttons for vs AI
     document.getElementById("easy").onclick = () => vsAI("easy");
     document.getElementById("medium").onclick = () => vsAI("medium");
     document.getElementById("hard").onclick = () => vsAI("hard");

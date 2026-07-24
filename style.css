@@ -59,13 +59,44 @@ body {
     margin-bottom: 3rem;
 }
 
+.header-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
 #header {
     font-size: clamp(3rem, 5vw, 5rem);
     font-weight: 800;
     color: var(--accent-primary);
     text-shadow: 0 0 20px rgba(0, 255, 170, 0.4);
-    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, text-shadow 0.2s ease;
     animation: fadeInUp 1s ease forwards;
+}
+
+#header:hover {
+    transform: scale(1.02);
+    text-shadow: 0 0 30px rgba(0, 255, 170, 0.6);
+}
+
+.btn-home {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    border: 1px solid var(--panel-border);
+}
+
+.btn-home:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--text-main);
 }
 
 #rules {
@@ -236,10 +267,10 @@ body {
 }
 .CodeMirror {
     flex: 1;
-    height: 100% !important; /* Force CodeMirror to fill panel */
+    height: 100% !important;
     font-family: 'Fira Code', monospace;
     font-size: 15px;
-    background: transparent !important; /* Let panel background show */
+    background: transparent !important;
 }
 .CodeMirror-gutters {
     background: rgba(0,0,0,0.2) !important;
@@ -284,7 +315,7 @@ body {
 
 @media (max-width: 1024px) {
     .workspace {
-        grid-template-columns: 1fr; /* Stack editor under challenge on smaller screens */
+        grid-template-columns: 1fr;
         height: auto;
     }
     .panel { min-height: 50vh; }
