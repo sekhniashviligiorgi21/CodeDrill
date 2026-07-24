@@ -1,200 +1,207 @@
-//-------------------------------------timer function--------------------------------
+//---------------------------------- DOM Elements --------------------------------
+const screens = {
+    mode: document.getElementById('mode-screen'),
+    level: document.getElementById('level-screen'),
+    game: document.getElementById('game-screen'),
+    postGame: document.getElementById('post-game-screen')
+};
+
+const rules = document.getElementById('rules');
+const header = document.getElementById('header');
+const challengeBox = document.getElementById('challenge');
+const aiBox = document.getElementById('gemini');
+
+//---------------------------------- Default CodeMirror --------------------------------
+const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+    mode: "python",
+    theme: "dracula",
+    lineNumbers: true,
+    tabSize: 4, // Python standard is 4 spaces
+    indentWithTabs: false,
+    lineWrapping: true
+});
+editor.setValue("# Write your Python code here...\n");
+
+//---------------------------------- Utility: View Routing --------------------------------
+function showScreen(screenKey) {
+    Object.values(screens).forEach(screen => screen.classList.add('hidden'));
+    if (screens[screenKey]) {
+        screens[screenKey].classList.remove('hidden');
+    }
+}
+
+//------------------------------------- Timer Function --------------------------------
 let seconds = 300;
 let timerInterval;
-function updateTime(){
-    document.getElementById("time").innerText=seconds + " seconds left."
+
+function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+function updateTime() {
+    document.getElementById("time").innerText = formatTime(seconds);
     if (seconds <= 0) {
-        clearInterval(timerInterval)
-        document.getElementById("time").innerText="Time's up!"
-        document.getElementById("submit").click()
+        clearInterval(timerInterval);
+        document.getElementById("time").innerText = "00:00";
+        document.getElementById("submit").click();
     }
 }
-function timer(){
-    if(timerInterval)
-        clearInterval(timerInterval)
-    seconds=300
-    updateTime()
 
-    timerInterval=setInterval(()=>{
+function timer() {
+    if (timerInterval) clearInterval(timerInterval);
+    seconds = 300;
+    updateTime();
+
+    timerInterval = setInterval(() => {
         seconds -= 1;
         updateTime();
-        if (seconds <= 0) {
-            clearInterval(timerInterval)
-            document.getElementById("submit").click()
-        }
-    }, 1000)
+    }, 1000);
 }
 
-//------------------------------------Play Again function--------------------------
-function playagain(){
-    document.getElementById("submit").disabled=false;
-    document.getElementById("time").style.display="none"
-    document.getElementById("reset").style.display="none"
-    document.getElementById("PG").style.display="none"
-    document.querySelector(".CodeMirror").style.display="none"
-    document.getElementById("submit").style.display="none"
-    document.getElementById("challenge").style.display="none"
+//------------------------------------ Play Again function --------------------------
+function playagain() {
+    document.getElementById("submit").disabled = false;
+    challengeBox.innerHTML = '';
+    aiBox.innerHTML = '';
+    aiBox.classList.add('hidden');
     
-    document.getElementById("choose_level").style.display="block"
-    document.querySelector(".level-buttons").style.display="flex"
-    
-    document.getElementById("challenge").innerHTML=``
-    document.getElementById("gemini").innerHTML=``
-    document.getElementById("gemini").style.display="none"
+    showScreen('level');
 }
 
-//-------------------------------------Singleplayer function--------------------------------
-async function level(level){
-    document.getElementById("submit").style.display="inline-flex"
-    document.getElementById("time").style.display="inline-block"
-    timer()
-    document.getElementById("reset").style.display="inline-flex"
+//------------------------------------- Singleplayer API Logic --------------------------------
+async function level(levelType) {
+    rules.classList.add('hidden');
+    showScreen('game');
+    
+    // Crucial fix: CodeMirror needs a refresh when its container goes from hidden -> visible
+    setTimeout(() => editor.refresh(), 50); 
+    
+    timer();
+
     document.getElementById("reset").onclick = () => location.reload();
-    document.getElementById("PG").style.display="inline-flex"
-    document.getElementById("PG").onclick = function(){
-        playagain()
-    }
-    document.querySelector(".CodeMirror").style.display="block"
-    document.getElementById("choose_level").style.display="none"
-    document.querySelector(".level-buttons").style.display="none"
-    
-    const response = await
-    fetch(`https://code-clash-backend-mqjr.onrender.com/singleplayer/${level}`);
-    const challenge = await response.json()
-    
-    document.getElementById("challenge").style.display="block"
-    document.getElementById("challenge").innerHTML=`
-        <h2>${challenge.title}</h2>
-        <p>You should write code to ${challenge.description}</p>
-        <p><strong>Example: </strong>${challenge.input_example} --> ${challenge.output_example}</p>
-    `
-    document.getElementById("submit").onclick=async function(){
-        document.getElementById("submit").disabled = true;
-        document.getElementById("submit").textContent="Analyzing code...";
-        const code=editor.getValue()
-        const res = await fetch("https://code-clash-backend-mqjr.onrender.com/analyzing-code",{
-            method:"POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({code: code, challenge_title: challenge.title})
-        })
-        document.getElementById("submit").textContent="Code analyzed!!!";
-        const result=await res.json()
-        document.getElementById("challenge").innerHTML+=`
-            <h3>AI feedback:</h3>
-            <p>Score: ${result.Score}</p>
-        `;
-        document.getElementById("submit").textContent="SUBMIT";
-    };
-}
+    document.getElementById("PG").onclick = playagain;
 
-//----------------------------------Default Code------------------------------------------
-const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
-  mode: "python",
-  theme: "dracula",
-  lineNumbers: true,
-  tabSize: 2,
-  indentWithTabs: true,
-  lineWrapping: true
-});
+    challengeBox.innerHTML = '<p>Loading challenge...</p>';
 
-editor.setValue("# Write your Python code here...");
-
-//--------------------------------------SinglePlayer mode----------------------------------------
-document.getElementById("singleplayer").onclick=async function(){
-    document.getElementById("header").innerText="Singleplayer Mode"
-    document.getElementById("rules").style.display="none"
-    document.getElementById("choose_level").style.display="block"
-    document.querySelector(".level-buttons").style.display="flex"
-    document.getElementById("choose_mode").style.display="none"
-    document.querySelector(".mode-buttons").style.display="none"
-
-    document.getElementById("easy").onclick=async function(){
-        level("easy")
-    }
-    document.getElementById("medium").onclick=async function(){
-        level("medium")
-    }
-    document.getElementById("hard").onclick=async function(){
-        level("hard")
-    }
-}
-
-//------------------------vsAI function-------------------------------------
-async function vsAI(lvl){
-    document.getElementById("submit").style.display="inline-flex"
-    document.getElementById("time").style.display="inline-block"
-    timer()
-    document.getElementById("reset").style.display="inline-flex"
-    document.getElementById("reset").onclick = () => location.reload();
-    document.getElementById("PG").style.display="inline-flex"
-    document.getElementById("PG").onclick = function(){
-        playagain()
-    }
-    document.querySelector(".CodeMirror").style.display="block"
-    document.getElementById("choose_level").style.display="none"
-    document.querySelector(".level-buttons").style.display="none"
-    
-    const response = await
-    fetch(`https://code-clash-backend-mqjr.onrender.com/vsAI/${lvl}`);
+    const response = await fetch(`https://code-clash-backend-mqjr.onrender.com/singleplayer/${levelType}`);
     const challenge = await response.json();
     
-    document.getElementById("challenge").style.display="block"
-    document.getElementById("challenge").innerHTML=`
-        <h2>${challenge.title}</h2>
+    challengeBox.innerHTML = `
+        <h3>${challenge.title}</h3>
         <p>You should write code to ${challenge.description}</p>
-        <p><strong>Example: </strong>${challenge.input_example} --> ${challenge.output_example}</p>
-    `
-    document.getElementById("submit").onclick=async function(){
-        document.getElementById("submit").disabled = true;
-        document.getElementById("submit").textContent="Analyzing code...";
-        const userCode=editor.getValue()
-        const res = await fetch("https://code-clash-backend-mqjr.onrender.com/analyzing-code",{
-            method:"POST",
+        <p><strong>Example: </strong><br> Input: <code>${challenge.input_example}</code> <br> Output: <code>${challenge.output_example}</code></p>
+    `;
+
+    const submitBtn = document.getElementById("submit");
+    submitBtn.onclick = async function() {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Analyzing...";
+        clearInterval(timerInterval); // Stop timer on submit
+        
+        const code = editor.getValue();
+        const res = await fetch("https://code-clash-backend-mqjr.onrender.com/analyzing-code", {
+            method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({code: userCode, challenge_title: challenge.title})
-        })
-        document.getElementById("submit").textContent="Code analyzed!!!";
-        const result=await res.json()
-        document.getElementById("challenge").innerHTML+=`
-            <h3>AI feedback:</h3>
-            <p>Score: ${result.Score}</p>
+            body: JSON.stringify({code: code, challenge_title: challenge.title})
+        });
+        
+        const result = await res.json();
+        submitBtn.textContent = "Code Analyzed";
+        
+        challengeBox.innerHTML += `
+            <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0, 255, 170, 0.1); border-radius: 8px;">
+                <h3>AI Feedback:</h3>
+                <p style="margin-top: 0.5rem; font-weight: bold; color: #00ffaa;">Score: ${result.Score}</p>
+            </div>
         `;
-        document.getElementById("submit").textContent="AI code loading...";
-        
-        const aiRes = await
-        fetch(`https://code-clash-backend-mqjr.onrender.com/writing-${lvl}-code`,{
-            method:"POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({code: userCode, challenge_title: challenge.title})
-        })
-        const aiData = await aiRes.json()
-        
-        document.querySelector(".right-panel").style.display="flex"
-        document.getElementById("gemini").style.display="block"
-        document.getElementById("gemini").innerHTML=`
-            <h3>AI's code for this challenge:</h3>
-            <pre>${aiData["AI's code"]}</pre>
-        `
-        document.getElementById("submit").textContent="SUBMIT";
+        screens.postGame.classList.remove('hidden');
     };
 }
 
-//-------------------------vsAI easy----------------------------------
-document.getElementById("AI").onclick=async function(){
-    document.getElementById("header").innerText="vs AI Mode"
-    document.getElementById("rules").style.display="none"
-    document.getElementById("choose_level").style.display="block"
-    document.querySelector(".level-buttons").style.display="flex"
-    document.getElementById("choose_mode").style.display="none"
-    document.querySelector(".mode-buttons").style.display="none"
+//-------------------------------------- vsAI API Logic ----------------------------------------
+async function vsAI(lvl) {
+    rules.classList.add('hidden');
+    showScreen('game');
+    setTimeout(() => editor.refresh(), 50);
+    timer();
 
-    document.getElementById("easy").onclick=async function(){
-        vsAI("easy")
-    }
-    document.getElementById("medium").onclick=async function(){
-        vsAI("medium")
-    }
-    document.getElementById("hard").onclick=async function(){
-        vsAI("hard")
-    }
+    document.getElementById("reset").onclick = () => location.reload();
+    document.getElementById("PG").onclick = playagain;
+
+    challengeBox.innerHTML = '<p>Loading challenge...</p>';
+
+    const response = await fetch(`https://code-clash-backend-mqjr.onrender.com/vsAI/${lvl}`);
+    const challenge = await response.json();
+    
+    challengeBox.innerHTML = `
+        <h3>${challenge.title}</h3>
+        <p>You should write code to ${challenge.description}</p>
+        <p><strong>Example: </strong><br> Input: <code>${challenge.input_example}</code> <br> Output: <code>${challenge.output_example}</code></p>
+    `;
+
+    const submitBtn = document.getElementById("submit");
+    submitBtn.onclick = async function() {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Analyzing Code...";
+        clearInterval(timerInterval);
+        
+        const userCode = editor.getValue();
+        
+        // 1. Analyze User Code
+        const res = await fetch("https://code-clash-backend-mqjr.onrender.com/analyzing-code", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({code: userCode, challenge_title: challenge.title})
+        });
+        
+        const result = await res.json();
+        challengeBox.innerHTML += `
+            <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0, 255, 170, 0.1); border-radius: 8px;">
+                <h3>Your Result:</h3>
+                <p style="margin-top: 0.5rem; font-weight: bold; color: #00ffaa;">Score: ${result.Score}</p>
+            </div>
+        `;
+
+        // 2. Fetch AI Code
+        submitBtn.textContent = "Loading AI Code...";
+        const aiRes = await fetch(`https://code-clash-backend-mqjr.onrender.com/writing-${lvl}-code`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({code: userCode, challenge_title: challenge.title})
+        });
+        const aiData = await aiRes.json();
+        
+        aiBox.classList.remove('hidden');
+        aiBox.innerHTML = `
+            <h3>AI's Solution:</h3>
+            <pre><code>${aiData["AI's code"]}</code></pre>
+        `;
+        
+        submitBtn.textContent = "Challenge Complete";
+        screens.postGame.classList.remove('hidden');
+    };
 }
+
+
+//------------------------- Mode Event Listeners ----------------------------------
+document.getElementById("singleplayer").onclick = function() {
+    header.innerText = "Singleplayer";
+    showScreen('level');
+    
+    // Rebind level buttons for Singleplayer
+    document.getElementById("easy").onclick = () => level("easy");
+    document.getElementById("medium").onclick = () => level("medium");
+    document.getElementById("hard").onclick = () => level("hard");
+};
+
+document.getElementById("AI").onclick = function() {
+    header.innerText = "vs AI";
+    showScreen('level');
+    
+    // Rebind level buttons for vs AI
+    document.getElementById("easy").onclick = () => vsAI("easy");
+    document.getElementById("medium").onclick = () => vsAI("medium");
+    document.getElementById("hard").onclick = () => vsAI("hard");
+};

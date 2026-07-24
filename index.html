@@ -4,51 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CodeDrill</title>
+    <!-- Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- CodeMirror Core + Theme -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="bg-animation"></div>
+
     <div class="app-container">
-        <header class="header-section">
+        <!-- Header -->
+        <header class="app-header">
             <h1 id="header">CodeDrill</h1>
-            <p id="rules">You've got 5 minutes to code your way through a random Python challenge! The AI will judge your solution. Can you outsmart the machine?</p>
-            <p id="choose_mode">Choose a gamemode:</p>
-            <div class="btn-group mode-buttons">
-                <button id="singleplayer" class="btn btn-primary">Singleplayer</button>
-                <button id="AI" class="btn btn-primary">vs AI</button>
-            </div>
+            <p id="rules">You've got 5 minutes to code your way through a random little python challenge!<br>The AI will judge your solution. Can you outsmart the machine?</p>
         </header>
 
-        <section class="level-section">
-            <p id="choose_level">Choose a level:</p>
-            <div class="btn-group level-buttons">
-                <button id="easy" class="btn btn-easy">Easy</button>
-                <button id="medium" class="btn btn-medium">Medium</button>
-                <button id="hard" class="btn btn-hard">Hard</button>
-            </div>
-        </section>
-
-        <main class="game-area">
-            <div class="left-panel">
-                <div id="time" class="timer-card"></div>
-                <div id="challenge" class="challenge-card"></div>
-                <textarea id="editor"></textarea>
-                <div class="action-buttons">
-                    <button id="submit" class="btn btn-submit">SUBMIT</button>
-                    <button id="PG" class="btn btn-secondary">Play Again</button>
-                    <button id="reset" class="btn btn-danger">Home</button>
+        <main class="app-main">
+            <!-- Screen 1: Mode Selection -->
+            <div id="mode-screen" class="screen-section">
+                <p class="section-title">Choose a Gamemode</p>
+                <div class="button-group">
+                    <button id="singleplayer" class="btn btn-primary">Singleplayer</button>
+                    <button id="AI" class="btn btn-secondary">vs AI</button>
                 </div>
             </div>
-            
-            <div class="right-panel">
-                <div id="gemini" class="ai-card"></div>
+
+            <!-- Screen 2: Level Selection -->
+            <div id="level-screen" class="screen-section hidden">
+                <p class="section-title">Choose a Level</p>
+                <div class="button-group">
+                    <button id="easy" class="btn btn-level level-easy">Easy</button>
+                    <button id="medium" class="btn btn-level level-medium">Medium</button>
+                    <button id="hard" class="btn btn-level level-hard">Hard</button>
+                </div>
+            </div>
+
+            <!-- Screen 3: Active Game Workspace -->
+            <div id="game-screen" class="workspace hidden">
+                <div class="panel left-panel">
+                    <div class="panel-header">
+                        <h2>Challenge</h2>
+                        <div id="time" class="timer">05:00</div>
+                    </div>
+                    <div class="panel-content">
+                        <div id="challenge" class="challenge-box"></div>
+                        <div id="gemini" class="ai-box hidden"></div>
+                    </div>
+                </div>
+
+                <div class="panel right-panel">
+                    <div class="panel-header">
+                        <h2>Editor</h2>
+                    </div>
+                    <div class="editor-wrapper">
+                        <textarea id="editor"></textarea>
+                    </div>
+                    <div class="action-bar">
+                        <button id="submit" class="btn btn-submit">Submit Code</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 4: Post Game Actions -->
+            <div id="post-game-screen" class="post-game-actions hidden">
+                <button id="PG" class="btn btn-primary">Play this mode again</button>
+                <button id="reset" class="btn btn-secondary">Back to Home</button>
             </div>
         </main>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
     <script src="code_clash.js"></script>
