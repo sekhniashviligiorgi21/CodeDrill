@@ -59,7 +59,7 @@ async function level(level){
     document.getElementById("medium").style.display="none"
     document.getElementById("hard").style.display="none"
     const response = await
-    fetch(`https://code-clash-oo71.onrender.com/singleplayer/${level}`);
+    fetch(`https://code-clash-backend-mqjr.onrender.com/singleplayer/${level}`);
     const challenge = await response.json()
     document.getElementById("challenge").innerHTML=`
         <h2>${challenge.title}</h2>
@@ -70,7 +70,7 @@ async function level(level){
         document.getElementById("submit").disabled = true;
         document.getElementById("submit").textContent="Analyzing code...";
         const code=editor.getValue()
-        const res = await fetch("https://code-clash-oo71.onrender.com/analyzing-code",{
+        const res = await fetch("https://code-clash-backend-mqjr.onrender.com/analyzing-code",{
             method:"POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({code: code, challenge_title: challenge.title})
@@ -155,7 +155,7 @@ async function vsAI(lvl){
     document.getElementById("medium").style.display="none"
     document.getElementById("hard").style.display="none"
     const response = await
-    fetch(`https://code-clash-oo71.onrender.com/vsAI/${lvl}`);
+    fetch(`https://code-clash-backend-mqjr.onrender.com/vsAI/${lvl}`);
     const challenge = await response.json();
     document.getElementById("challenge").innerHTML=`
         <h2>${challenge.title}</h2>
@@ -166,7 +166,7 @@ async function vsAI(lvl){
         document.getElementById("submit").disabled = true;
         document.getElementById("submit").textContent="Analyzing code...";
         const userCode=editor.getValue()
-        const res = await fetch("https://code-clash-oo71.onrender.com/analyzing-code",{
+        const res = await fetch("https://code-clash-backend-mqjr.onrender.com/analyzing-code",{
             method:"POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({code: userCode, challenge_title: challenge.title})
@@ -179,7 +179,7 @@ async function vsAI(lvl){
         `;
         document.getElementById("submit").textContent="AI code loading...";
         const aiRes = await
-        fetch(`https://code-clash-oo71.onrender.com/writing-${lvl}-code`,{
+        fetch(`https://code-clash-backend-mqjr.onrender.com/writing-${lvl}-code`,{
             method:"POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({code: userCode, challenge_title: challenge.title})
