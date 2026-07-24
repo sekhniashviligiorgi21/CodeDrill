@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Codedrill</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<div class="layout">
+		<h1 id="header">CodeDrill</h1>
+		<p id="rules">You've got 5 minutes to code your way through a random little python challenge!
+		The AI will judge your solution. Can you outsmart the machine?</p>
+		<p id="choose_mode">Choose a gamemode:</p>
+		<p id="choose_level">Choose a level:</p>
+		<p id="time"></p>
+		<button id="singleplayer">singleplayer</button>
+		<button id="AI">vsAI</button>
+		<button id="easy">Easy</button>
+		<button id="medium">Medium</button>
+		<button id="hard">Hard</button>
+		<div id="challenge"></div>
+		<textarea id="editor"></textarea>
+		<button id="submit">SUBMIT</button>
+		<p id="gemini"></p>
+		<button id="PG">Play this mode again.</button>
+		<button id="reset">Back to home screen</button>
+	</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+	<script src="code_clash.js"></script>
+</body>
+</html>
